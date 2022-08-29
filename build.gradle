@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.mobile.automation'
+version = '1.0.0'
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.appium:java-client:7.6.0'
+    implementation 'org.slf4j:slf4j-log4j12:1.7.30'
+    implementation 'org.aeonbits.owner:owner-java8:1.0.12'
+    implementation 'org.testng:testng:7.1.0'
+    testImplementation 'org.testng:testng:7.4.0'
+}
+
+test {
+    useTestNG(){
+    }
+}
