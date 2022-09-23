@@ -1,7 +1,6 @@
 package engine;
 
 import cfg.MobileConfig;
-import driver.DriverProvider;
 
 import java.util.Arrays;
 import java.util.function.Supplier;

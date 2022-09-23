@@ -1,8 +1,8 @@
 package view.main;
 
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import org.openqa.selenium.remote.RemoteWebElement;
 import view.AbstractView;
 
 import static engine.ElementsFinder.findByIosNsPredicate;
@@ -11,14 +11,14 @@ public class ApiDemosView extends AbstractView {
 
     @AndroidFindBy(uiAutomator = "text(\"Animation\")")
     @iOSXCUITFindBy(iOSNsPredicate = "name = 'Animation'")
-    private MobileElement animationButton;
+    private RemoteWebElement animationButton;
 
     @AndroidFindBy(uiAutomator = "text(\"Cloning\")")
     @iOSXCUITFindBy(iOSNsPredicate = "name = 'Cloning'")
-    private MobileElement cloningButton;
+    private RemoteWebElement cloningButton;
     @AndroidFindBy(uiAutomator = "text(\"OS\")")
     @iOSXCUITFindBy(iOSNsPredicate = "name = 'OS'")
-    private MobileElement osButton;
+    private RemoteWebElement osButton;
 
     @Override
     public boolean isActive() {

@@ -1,6 +1,6 @@
 package view.main;
 
-import io.appium.java_client.MobileElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import view.AbstractView;
@@ -8,7 +8,7 @@ import view.AbstractView;
 public class AnimationCloningView extends AbstractView {
     @AndroidFindBy(uiAutomator = "text(\"RUN\")")
     @iOSXCUITFindBy(iOSNsPredicate = "name = 'RUN'")
-    private MobileElement runButton;
+    private RemoteWebElement runButton;
 
     @Override
     public boolean isActive() {

@@ -2,6 +2,7 @@ package appmanagement;
 
 import cfg.MobileConfig;
 import driver.DriverProvider;
+import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.android.Activity;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -27,7 +28,13 @@ public class InteractionsWithApp {
      */
     public void minimizeApp() {
         LOG.info("Going to minimize app: {}", config.getAppPackage());
-        DriverProvider.get().getDriver().terminateApp(config.getAppPackage());
+       getInteractionWithApps().terminateApp(config.getAppPackage());
+    }
+
+    public static InteractsWithApps getInteractionWithApps() {
+        return is(ANDROID)
+                ? (AndroidDriver) DriverProvider.get().getDriver()
+                : (IOSDriver) DriverProvider.get().getDriver();
     }
 
     /**
@@ -35,7 +42,7 @@ public class InteractionsWithApp {
      */
     public static void removeApp() {
         LOG.debug("Removing app with bundleId: {}", config.getAppPackage());
-        DriverProvider.get().getDriver().removeApp(config.getAppPackage());
+        getInteractionWithApps().removeApp(config.getAppPackage());
     }
 
     /**
@@ -48,11 +55,11 @@ public class InteractionsWithApp {
     }
 
     public static void installApp(String appPath) {
-        DriverProvider.get().getDriver().installApp(appPath);
+        getInteractionWithApps().installApp(appPath);
     }
 
     public static void startAndroidActivity(Activity activity) {
-        ((AndroidDriver) DriverProvider.get().getDriver()).startActivity(activity);
+        ((AndroidDriver) getInteractionWithApps()).startActivity(activity);
     }
 
     /**
@@ -61,17 +68,17 @@ public class InteractionsWithApp {
      */
     public static void terminateApp() {
         LOG.info("Going to terminate app: {}", config.getAppPackage());
-        DriverProvider.get().getDriver().terminateApp(config.getAppPackage());
+        getInteractionWithApps().terminateApp(config.getAppPackage());
     }
 
     public static void killApp() {
         LOG.info("Going to kill app: {}", config.getAppPackage());
-        ANDROID.run(() -> {
-            ((AndroidDriver) DriverProvider.get().getDriver()).pressKey(new KeyEvent().withKey(APP_SWITCH));
-            ((AndroidDriver) DriverProvider.get().getDriver()).findElementByAndroidUIAutomator(
+/*        ANDROID.run(() -> {
+            ((AndroidDriver) getInteractionWithApps()).pressKey(new KeyEvent().withKey(APP_SWITCH));
+            ((AndroidDriver) getInteractionWithApps()).findElementByAndroidUIAutomator(
                     "resourceIdMatches(\".*com.sec.android.app.launcher:id/clear_all.*\")").click();
-        });
-        IOS.run(() -> DriverProvider.get().getDriver().terminateApp(config.getAppPackage()));
+        });*/
+        IOS.run(() -> getInteractionWithApps().terminateApp(config.getAppPackage()));
     }
 
     /**
@@ -79,14 +86,14 @@ public class InteractionsWithApp {
      * background.*
      */
     public static void activateApp() {
-        DriverProvider.get().getDriver().activateApp(config.getAppPackage());
+        getInteractionWithApps().activateApp(config.getAppPackage());
     }
 
     /**
      * Terminate the Settings application if it is running.
      */
     public void closePhoneSettingsIOS() {
-        IOS.run(() -> DriverProvider.get().getDriver().terminateApp("com.apple.Preferences"));
+        IOS.run(() -> getInteractionWithApps().terminateApp("com.apple.Preferences"));
     }
 
     /**
@@ -109,23 +116,23 @@ public class InteractionsWithApp {
 
     public void lockDevice() {
         if (is(IOS)) {
-            ((IOSDriver) DriverProvider.get().getDriver()).lockDevice();
+            ((IOSDriver) getInteractionWithApps()).lockDevice();
         } else {
-            ((AndroidDriver) DriverProvider.get().getDriver()).lockDevice();
+            ((AndroidDriver) getInteractionWithApps()).lockDevice();
         }
     }
 
     public void unlockDevice() {
         if (is(IOS)) {
-            ((IOSDriver) DriverProvider.get().getDriver()).unlockDevice();
+            ((IOSDriver) getInteractionWithApps()).unlockDevice();
         } else {
-            ((AndroidDriver) DriverProvider.get().getDriver()).unlockDevice();
+            ((AndroidDriver) getInteractionWithApps()).unlockDevice();
         }
     }
 
     public void runAppInBackground(Duration duration) {
         LOG.info("Running app in background for {}", duration);
-        DriverProvider.get().getDriver().runAppInBackground(duration);
+        getInteractionWithApps().runAppInBackground(duration);
         LOG.info("App is back from background");
     }
 }

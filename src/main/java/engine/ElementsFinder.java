@@ -1,64 +1,54 @@
 package engine;
 
 import driver.DriverProvider;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.ios.IOSElement;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
-
-import java.util.List;
-
-import static engine.AppPlatform.IOS;
-import static engine.AppPlatform.is;
-import static java.lang.String.format;
+import org.openqa.selenium.remote.RemoteWebElement;
 
 public class ElementsFinder {
 
-    public static IOSElement findByIosNsPredicate(String predicated) {
-        return (IOSElement) ((IOSDriver) getDriver()).findElementByIosNsPredicate(predicated);
+    public static RemoteWebElement findByIosNsPredicate(String predicated) {
+        return (RemoteWebElement) getDriver().findElement(AppiumBy.iOSNsPredicateString(predicated));
     }
 
-    public static MobileElement findByIosNsPredicate(MobileElement element, String predicated) {
-        return ((IOSElement) element).findElementByIosNsPredicate(predicated);
+    public static RemoteWebElement findByIosNsPredicate(RemoteWebElement element, String predicated) {
+        return (RemoteWebElement) element.findElement(AppiumBy.iOSNsPredicateString(predicated));
     }
+/*
 
-    public static MobileElement findByAccessibilityId(String accessibilityId) {
+    public static RemoteWebElement findByAccessibilityId(String accessibilityId) {
         return getDriver().findElementByAccessibilityId(accessibilityId);
     }
 
-    public static List<MobileElement> findElementsByIosNsPredicate(MobileElement baseElement, String predicate) {
-        return ((IOSElement) baseElement).findElementsByIosNsPredicate(predicate);
+    public static List<RemoteWebElement> findElementsByIosNsPredicate(RemoteWebElement baseElement, String predicate) {
+        return ((RemoteWebElement) baseElement).findElementsByIosNsPredicate(predicate);
     }
 
-    public static List<MobileElement> findElementsByIosNsPredicate(String predicated) {
-        return ((IOSDriver<MobileElement>) getDriver()).findElementsByIosNsPredicate(predicated);
+    public static List<RemoteWebElement> findElementsByIosNsPredicate(String predicated) {
+        return ((IOSDriver<RemoteWebElement>) getDriver()).findElementsByIosNsPredicate(predicated);
     }
 
-    public static IOSElement findElementByIosClassChain(String classChainString) {
-        return (IOSElement) ((IOSDriver<?>) getDriver()).findElementByIosClassChain(classChainString);
+    public static RemoteWebElement findElementByIosClassChain(String classChainString) {
+        return (RemoteWebElement) ((IOSDriver<?>) getDriver()).findElementByIosClassChain(classChainString);
     }
 
-    public static MobileElement findByAndroidUiAutomator(String uiSelector) {
-        return ((AndroidDriver<MobileElement>) getDriver()).findElementByAndroidUIAutomator(uiSelector);
+    public static RemoteWebElement findByAndroidUiAutomator(String uiSelector) {
+        return ((AndroidDriver<RemoteWebElement>) getDriver()).findElementByAndroidUIAutomator(uiSelector);
     }
 
-    public static MobileElement findByAndroidUiAutomator(MobileElement element, String uiSelector) {
+    public static RemoteWebElement findByAndroidUiAutomator(RemoteWebElement element, String uiSelector) {
         return ((AndroidElement) element).findElementByAndroidUIAutomator(uiSelector);
     }
 
-    public static List<MobileElement> findElementsByAndroidUiAutomator(String uiSelector) {
-        return ((AndroidDriver<MobileElement>) getDriver()).findElementsByAndroidUIAutomator(uiSelector);
+    public static List<RemoteWebElement> findElementsByAndroidUiAutomator(String uiSelector) {
+        return ((AndroidDriver<RemoteWebElement>) getDriver()).findElementsByAndroidUIAutomator(uiSelector);
     }
 
-    public static MobileElement findByXpath(final String xpath) {
+    public static RemoteWebElement findByXpath(final String xpath) {
         return getDriver().findElementByXPath(xpath);
     }
 
-    public static MobileElement findElementByText(final String text) {
+    public static RemoteWebElement findElementByText(final String text) {
         try {
             return (is(IOS)
                     ? findByIosNsPredicate(format("type==\"XCUIElementTypeStaticText\" and label==\"%s\"", text))
@@ -68,7 +58,7 @@ public class ElementsFinder {
         }
     }
 
-    public static MobileElement findElementByPartialText(final String text) {
+    public static RemoteWebElement findElementByPartialText(final String text) {
         return (is(IOS)
                 ? findElementsByIosNsPredicate(format("type==\"XCUIElementTypeStaticText\" and label contains \"%s\"", text))
                 : findElementsByAndroidUiAutomator(format("textContains(\"%s\")", text)))
@@ -76,23 +66,24 @@ public class ElementsFinder {
                         new TimeoutException(format("Could not find element with text matches '%s'", text)));
     }
 
-    public static MobileElement findElementByTextFromParent(final String text, final MobileElement parentElement) {
+    public static RemoteWebElement findElementByTextFromParent(final String text, final RemoteWebElement parentElement) {
         return (is(IOS)
-                ? ((IOSElement) parentElement).findElementsByIosNsPredicate(format("type==\"XCUIElementTypeStaticText\"" +
+                ? ((RemoteWebElement) parentElement).findElementsByIosNsPredicate(format("type==\"XCUIElementTypeStaticText\"" +
                 " and label==\"%s\"", text))
                 : ((AndroidElement) parentElement).findElementsByAndroidUIAutomator(format("text(\"%s\")",
                 text)))
                 .stream().findFirst().orElse(null);
     }
 
-    public static MobileElement findButtonByText(final String text) {
+    public static RemoteWebElement findButtonByText(final String text) {
         return (is(IOS)
                 ? findElementsByIosNsPredicate(format("type==\"XCUIElementTypeButton\" and label==\"%s\"", text))
                 : findElementsByAndroidUiAutomator(format("text(\"%s\")", text)))
                 .stream().findFirst().orElse(null);
     }
+*/
 
-    public static AppiumDriver<MobileElement> getDriver() {
+    public static AppiumDriver getDriver() {
         return DriverProvider.get().getDriver();
     }
 }

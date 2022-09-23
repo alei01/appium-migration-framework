@@ -2,14 +2,16 @@ package engine;
 
 import driver.DriverProvider;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
+import io.appium.java_client.PerformsTouchActions;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.KeyEvent;
 import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -18,7 +20,6 @@ import static io.appium.java_client.android.nativekey.AndroidKey.BACK;
 import static io.appium.java_client.android.nativekey.AndroidKey.HOME;
 import static io.appium.java_client.touch.TapOptions.tapOptions;
 import static io.appium.java_client.touch.WaitOptions.waitOptions;
-import static io.appium.java_client.touch.offset.ElementOption.element;
 import static io.appium.java_client.touch.offset.PointOption.point;
 import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofSeconds;
@@ -28,24 +29,24 @@ public class Touches {
     private Touches() {
     }
 
-    public static void swipeLeft(MobileElement element) {
+    public static void swipeLeft(RemoteWebElement element) {
         swipeLeft(element, ofMillis(50));
     }
 
-    public static void swipeLeft(MobileElement element, Duration duration) {
-        Point center = element.getCenter();
+    public static void swipeLeft(RemoteWebElement element, Duration duration) {
+        Point center = getCenter(element);
         int windowWidth = getDriver().manage().window().getSize().getWidth();
         PointOption pressPoint = point((int) (windowWidth * 0.7), center.getY());
         PointOption moveToPoint = point((int) (windowWidth * 0.3), center.getY());
         swipe(pressPoint, moveToPoint, duration);
     }
 
-    public static void swipeRight(MobileElement element) {
+    public static void swipeRight(RemoteWebElement element) {
         swipeRight(element, ofMillis(50));
     }
 
-    public static void swipeRight(MobileElement element, Duration duration) {
-        Point center = element.getCenter();
+    public static void swipeRight(RemoteWebElement element, Duration duration) {
+        Point center = getCenter(element);
         int windowWidth = getDriver().manage().window().getSize().getWidth();
         PointOption pressPoint = point((int) (windowWidth * 0.3), center.getY());
         PointOption moveToPoint = point((int) (windowWidth * 0.7), center.getY());
@@ -72,7 +73,7 @@ public class Touches {
         swipeDown(element, 0.10);
     }
 
-    public static MobileElement swipeDownTo(MobileElement baseToSwipe, Supplier<MobileElement> elementSupplier) {
+    public static RemoteWebElement swipeDownTo(RemoteWebElement baseToSwipe, Supplier<RemoteWebElement> elementSupplier) {
         return swipeDownTo(baseToSwipe, elementSupplier);
     }
 
@@ -85,16 +86,16 @@ public class Touches {
      * Useful to collect some data through a scrollable view. Runnable is executed on page-end condition check.
      */
     @Deprecated(since = "20.0.0")
-    public static void swipeToPageBottomAndPerSwipeDo(MobileElement baseToSwipe, Runnable run, double percentageToIgnoreBottom) {
+    public static void swipeToPageBottomAndPerSwipeDo(RemoteWebElement baseToSwipe, Runnable run, double percentageToIgnoreBottom) {
         StringBuilder pageSourceIndicator = new StringBuilder();
         swipeDownUntil(baseToSwipe, getPageSourceNotChangedAfterRunnableSupplier(pageSourceIndicator, run), percentageToIgnoreBottom);
     }
 
-    public static void swipeToPageBottomAndPerSwipeDo(MobileElement baseToSwipe, Runnable run) {
+    public static void swipeToPageBottomAndPerSwipeDo(RemoteWebElement baseToSwipe, Runnable run) {
         swipeToPageBottomAndPerSwipeDo(baseToSwipe, run, 0.1);
     }
 
-    public static void swipeToPageTopAndPerSwipeDo(MobileElement baseToSwipe, Runnable run) {
+    public static void swipeToPageTopAndPerSwipeDo(RemoteWebElement baseToSwipe, Runnable run) {
         StringBuilder pageSourceIndicator = new StringBuilder();
         swipeUpUntil(baseToSwipe, getPageSourceNotChangedAfterRunnableSupplier(pageSourceIndicator, run));
     }
@@ -108,7 +109,7 @@ public class Touches {
      * false if condition wasn't met within limit or page bottom has been reached
      */
     @Deprecated(since = "20.0.0")
-    public static boolean swipeToPageBottomUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
+    public static boolean swipeToPageBottomUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
         StringBuilder stringBuilder = new StringBuilder();
         boolean conditionMatched = conditionSupplier.get();
         for (int scroll = 0; scroll < 15 && !conditionMatched && !getPageSourceNotChangedSupplier(stringBuilder).get(); scroll++) {
@@ -126,7 +127,7 @@ public class Touches {
      * @return true if condition was met within limited amount of swipes;
      * false if condition wasn't met within limit or page top has been reached
      */
-    public static boolean swipeToPageTopUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
+    public static boolean swipeToPageTopUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
         StringBuilder stringBuilder = new StringBuilder();
         boolean conditionMatched = conditionSupplier.get();
         for (int scroll = 0; scroll < 15 && !conditionMatched && !getPageSourceNotChangedSupplier(stringBuilder).get(); scroll++) {
@@ -136,7 +137,7 @@ public class Touches {
         return conditionMatched;
     }
 
-    public static boolean swipeDownUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier, double percentageToIgnoreBottom) {
+    public static boolean swipeDownUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier, double percentageToIgnoreBottom) {
         return swipeDownUntil(baseToSwipe, conditionSupplier, percentageToIgnoreBottom, 15);
     }
 
@@ -151,7 +152,7 @@ public class Touches {
      * @param maxSwipe                 limit amount of swipes
      * @return true if condition was met within limited amount of swipes
      */
-    public static boolean swipeDownUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier, double percentageToIgnoreBottom, int maxSwipe) {
+    public static boolean swipeDownUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier, double percentageToIgnoreBottom, int maxSwipe) {
         boolean conditionMatched = conditionSupplier.get();
         for (int scroll = 0; scroll < maxSwipe && !conditionMatched; scroll++) {
             swipeDown(baseToSwipe, percentageToIgnoreBottom);
@@ -160,7 +161,7 @@ public class Touches {
         return conditionMatched;
     }
 
-    public static boolean swipeUpUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
+    public static boolean swipeUpUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
         return swipeUpUntil(baseToSwipe, conditionSupplier, 15);
     }
 
@@ -172,7 +173,7 @@ public class Touches {
      * @param maxSwipe          limit amount of swipes
      * @return true if condition was met within limited amount of swipes
      */
-    public static boolean swipeUpUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier, int maxSwipe) {
+    public static boolean swipeUpUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier, int maxSwipe) {
         boolean conditionMatched = conditionSupplier.get();
         for (int scroll = 0; scroll < maxSwipe && !conditionMatched; scroll++) {
             swipeUp(baseToSwipe);
@@ -181,15 +182,15 @@ public class Touches {
         return conditionMatched;
     }
 
-    public static boolean swipeDownUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
+    public static boolean swipeDownUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier) {
         return swipeDownUntil(baseToSwipe, conditionSupplier, 0.1);
     }
 
-    public static boolean swipeDownUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier, int maxSwipe) {
+    public static boolean swipeDownUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier, int maxSwipe) {
         return swipeDownUntil(baseToSwipe, conditionSupplier, 0.1, maxSwipe);
     }
 
-    public static boolean swipeLeftUntil(MobileElement baseToSwipe, Supplier<Boolean> conditionSupplier, int maxSwipe) {
+    public static boolean swipeLeftUntil(RemoteWebElement baseToSwipe, Supplier<Boolean> conditionSupplier, int maxSwipe) {
         boolean conditionMatched = conditionSupplier.get();
         for (int scroll = 0; scroll < maxSwipe && !conditionMatched; scroll++) {
             swipeLeft(baseToSwipe);
@@ -214,7 +215,7 @@ public class Touches {
         return original >= max ? max - 1 : original;
     }
 
-    public static void tapPercentage(MobileElement el, double percentage) {
+    public static void tapPercentage(RemoteWebElement el, double percentage) {
         if (percentage >= 0 && percentage <= 1) {
             Point location = el.getLocation();
             Dimension size = el.getSize();
@@ -231,20 +232,20 @@ public class Touches {
         touches().tap(tapOptions().withTapsCount(1).withPosition(point(size.width / 2, size.height / 2))).perform();
     }
 
-    public static void tapInCenterOfElement(MobileElement element) {
-        Point center = element.getCenter();
+    public static void tapInCenterOfElement(RemoteWebElement element) {
+        Point center = getCenter(element);
         tap(center.getX(), center.getY());
     }
 
-    public static void tapRightFacet(MobileElement element) {
+    public static void tapRightFacet(RemoteWebElement element) {
         Point topLeft = element.getLocation();
         int height = element.getSize().getHeight();
         int width = element.getSize().getWidth();
         tap(topLeft.getX() + width - 10, topLeft.getY() + height / 2);
     }
 
-    public static void doubleTap(MobileElement element) {
-        touches().tap(tapOptions().withElement(element(element)).withTapsCount(2)).perform();
+    public static void doubleTap(RemoteWebElement element) {
+    //    touches().tap(tapOptions().withElement(element).withTapsCount(2)).perform();
     }
 
     public static void clickAndroidBackButton() {
@@ -278,9 +279,9 @@ public class Touches {
         swipe(pressPoint, moveToPoint, ofSeconds(1));
     }
 
-    public static void swipe(final MobileElement press, final MobileElement release) {
-        Point releasePoint = release.getCenter();
-        Point pressPoint = press.getCenter();
+    public static void swipe(final RemoteWebElement press, final RemoteWebElement release) {
+        Point releasePoint = getCenter(release);
+        Point pressPoint = getCenter(press);
         PointOption<?> pressP = PointOption.point(pressPoint.getX(), pressPoint.getY());
         PointOption<?> releaseP = PointOption.point(releasePoint.getX(), releasePoint.getY());
         Touches.swipe(pressP, releaseP, Duration.ofMillis(3000));
@@ -294,18 +295,8 @@ public class Touches {
                 ofMillis(500));
     }
 
-    public static void moveSliderToPosition(MobileElement slider, double movePoint) {
-        int y = slider.getLocation().getY();
-
-        new TouchAction(getDriver())
-                .longPress(point(slider.getCenter().getX(), y))
-                .moveTo(point((int) (slider.getSize().getWidth() * movePoint), y))
-                .release()
-                .perform();
-    }
-
     private static TouchAction touches() {
-        return new TouchAction(getDriver());
+        return new TouchAction((PerformsTouchActions) getDriver());
     }
 
     private static AppiumDriver getDriver() {
@@ -339,5 +330,10 @@ public class Touches {
             run.run();
             return initialPageSource.equals(updatedPageSource);
         };
+    }
+
+    public static Point getCenter(RemoteWebElement element) {
+        Rectangle rect = element.getRect();
+        return new Point(rect.width / 2, rect.height / 2);
     }
 }
